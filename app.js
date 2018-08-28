@@ -1,7 +1,7 @@
-const request = require("request");
 const yargs = require("yargs");
 
 const geocode = require("./geocode/geocode");
+const weather = require("./weather/weather");
 const config = require("./config");
 
 const argv = yargs
@@ -20,24 +20,21 @@ geocode.geocodeAddress(argv.address, (errorMessage, results) => {
   if (errorMessage) {
     console.log(errorMessage);
   } else {
-    console.log(JSON.stringify(results, undefined, 2));
+    console.log(results.address);
+    weather.getWeather(
+      results.latitude,
+      results.longitude,
+      (errorMessage, weatherResults) => {
+        if (errorMessage) {
+          console.log(errorMessage);
+        } else {
+          console.log(
+            `It currently is ${
+              weatherResults.temperature
+            }F, and it feels like ${weatherResults.apparentTemperature}F.`
+          );
+        }
+      }
+    );
   }
 });
-
-request(
-  {
-    url: `https://api.darkskynet/forecast/${
-      config.darkSkiesKey
-    }/59.2986114,17.9888209`,
-    json: true
-  },
-  (error, response, body) => {
-    if (error) {
-      console.log("Unable to connect to Dark Skies server.");
-    } else if (body.code === "400") {
-      console.log("The given location is invalid.");
-    } else {
-      console.log(`Temperature: ${body.currently.temperature}`);
-    }
-  }
-);
