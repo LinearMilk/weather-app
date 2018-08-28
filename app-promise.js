@@ -30,7 +30,7 @@ axios
     var lng = response.data.results[0].geometry.location.lng;
     var weatherUrl = `https://api.darksky.net/forecast/${
       config.darkSkiesKey
-    }/${lat},${lng}`;
+    }/${lat},${lng}?units=si`;
     console.log(response.data.results[0].formatted_address);
     return axios.get(weatherUrl);
   })
@@ -38,8 +38,9 @@ axios
     var temperature = response.data.currently.temperature;
     var apparentTemperature = response.data.currently.apparentTemperature;
     console.log(
-      `It's currently ${temperature}F, it feels like ${apparentTemperature}F.`
+      `It's currently ${temperature}C, it feels like ${apparentTemperature}C.`
     );
+    console.log(response.data.daily.summary);
   })
   .catch(e => {
     if (e.code === "ENOTFOUND") {
