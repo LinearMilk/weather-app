@@ -1,8 +1,8 @@
 const request = require("request");
 
-const config = require("./config");
+const config = require("../config");
 
-var geocodeAddress = address => {
+var geocodeAddress = (address, callback) => {
   var encodedAddress = encodeURIComponent(address);
   const apiKey = config.googleKey;
   request(
@@ -12,13 +12,15 @@ var geocodeAddress = address => {
     },
     (error, response, body) => {
       if (error) {
-        console.log("Unable to connect to Google servers.");
+        callback("Unable to connect to Google servers.");
       } else if (body.status === "ZERO_RESULTS") {
-        console.log("Address not found.");
+        callback("Address not found.");
       } else if (body.status === "OK") {
-        console.log(`Address: ${body.results[0].formatted_address}`);
-        console.log(`Lattitude: ${body.results[0].geometry.location.lat}`);
-        console.log(`Longitude: ${body.results[0].geometry.location.lng}`);
+        callback(undefined, {
+          address: body.results[0].formatted_address,
+          latitude: body.results[0].geometry.location.lat,
+          longitude: body.results[0].geometry.location.lng
+        });
       }
     }
   );
